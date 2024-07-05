@@ -1,0 +1,36 @@
+version: '3.4'
+
+services:
+  rental.api:
+    image: ${DOCKER_REGISTRY-}rentalapi
+    container_name: Rental.Api
+    build:
+      context: .
+      dockerfile: src/Rental.Api/Dockerfile
+    depends_on:
+      - rental-db
+
+  rental-db:
+    image: postgres:latest
+    container_name: Rental.Db
+    environment:
+      - POSTGRES_DB=rental
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+    volumes:
+      - ./.containers/database:/var/lib/postgresql/data
+    ports:
+      - 5432:5432
+
+  rental-idp:
+    image: quay.io/keycloak/keycloak:latest
+    container_name: Rental.Identity
+    command: start-dev --import-realm
+    environment:
+      - KEYCLOAK_ADMIN=admin
+      - KEYCLOAK_ADMIN_PASSWORD=admin
+    volumes:
+      - ./.containers/identity:/opt/keycloak/data
+      - ./.files/rental-realm-export.json:/opt/keycloak/data/import/realm.json
+    ports:
+      - 18080:8080
