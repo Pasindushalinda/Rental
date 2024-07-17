@@ -51,7 +51,7 @@
         "description": "${role_uma_authorization}",
         "composite": false,
         "clientRole": false,
-        "containerId": "rental",
+        "containerId": "Rental",
         "attributes": {}
       },
       {

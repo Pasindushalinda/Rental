@@ -9,10 +9,13 @@ EXPOSE 5001
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
-COPY ["Rental.Api/Rental.Api.csproj", "Rental.Api/"]
-RUN dotnet restore "./Rental.Api/Rental.Api.csproj"
+COPY ["src/Rental.Api/Rental.Api.csproj", "src/Rental.Api/"]
+COPY ["src/Rental.Application/Rental.Application.csproj", "src/Rental.Application/"]
+COPY ["src/Rental.Domain/Rental.Domain.csproj", "src/Rental.Domain/"]
+COPY ["src/Rental.Infrastructure/Rental.Infrastructure.csproj", "src/Rental.Infrastructure/"]
+RUN dotnet restore "./src/Rental.Api/Rental.Api.csproj"
 COPY . .
-WORKDIR "/src/Rental.Api"
+WORKDIR "/src/src/Rental.Api"
 RUN dotnet build "./Rental.Api.csproj" -c $BUILD_CONFIGURATION -o /app/build
 
 FROM build AS publish

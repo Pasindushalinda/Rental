@@ -5,6 +5,7 @@ namespace Rental.Domain.Users;
 
 public class User : Entity
 {
+    private readonly List<Role> _roles = new();
     public FirstName FirstName { get; private set; }
 
     public LastName LastName { get; private set; }
@@ -12,6 +13,8 @@ public class User : Entity
     public Email Email { get; private set; }
 
     public string IdentityId { get; private set; } = string.Empty;
+
+    public IReadOnlyCollection<Role> Roles => _roles.ToList();
 
     public User()
     {
@@ -39,6 +42,8 @@ public class User : Entity
         var user = new User(Guid.NewGuid(), firstName, lastName, email);
 
         user.RaiseDomainEvent(new UserCreatedDomainEvent(user.Id));
+
+        user._roles.Add(Role.Registered);
 
         return user;
     }

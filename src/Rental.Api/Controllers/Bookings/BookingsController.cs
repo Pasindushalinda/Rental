@@ -1,4 +1,5 @@
 ﻿using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Rental.Application.Bookings.GetBooking;
@@ -6,6 +7,7 @@ using Rental.Application.Bookings.ReserveBooking;
 
 namespace Rental.Api.Controllers.Bookings
 {
+    [Authorize]
     [Route("api/[controller]")]
     [ApiController]
     public class BookingsController : ControllerBase

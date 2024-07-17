@@ -1,8 +1,10 @@
 ﻿using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Rental.Application.Users.GetLoggedInUser;
 using Rental.Application.Users.LogInUser;
 using Rental.Application.Users.RegisterUser;
+using Rental.Infrastructure.Authorization;
 
 namespace Rental.Api.Controllers.Users;
 
@@ -15,6 +17,18 @@ public class UsersController : Controller
     public UsersController(ISender sender)
     {
         _sender = sender;
+    }
+
+    [HttpGet("me")]
+    [Authorize(Roles = Roles.Registered)] 
+    [HasPermission(Permissions.UsersRead)]
+    public async Task<IActionResult> GetLoggedInUser(CancellationToken cancellationToken)
+    {
+        var query = new GetLoggedInUserQuery();
+
+        var result = await _sender.Send(query, cancellationToken);
+
+        return Ok(result.Value);
     }
 
     [AllowAnonymous]

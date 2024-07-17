@@ -1,5 +1,7 @@
 ﻿using Dapper;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -13,10 +15,14 @@ using Rental.Domain.Apartments;
 using Rental.Domain.Bookings;
 using Rental.Domain.Users;
 using Rental.Infrastructure.Authentication;
+using Rental.Infrastructure.Authorization;
 using Rental.Infrastructure.Clock;
 using Rental.Infrastructure.Data;
 using Rental.Infrastructure.Email;
 using Rental.Infrastructure.Repositories;
+using AuthenticationOptions = Rental.Infrastructure.Authentication.AuthenticationOptions;
+using AuthenticationService = Rental.Infrastructure.Authentication.AuthenticationService;
+using IAuthenticationService = Rental.Application.Abstractions.Authentication.IAuthenticationService;
 
 namespace Rental.Infrastructure
 {
@@ -32,6 +38,8 @@ namespace Rental.Infrastructure
             AddPersistence(services, configuration);
 
             AddAuthentication(services, configuration);
+
+            AddAuthorization(services);
 
             return services;
         }
@@ -64,6 +72,10 @@ namespace Rental.Infrastructure
 
                 httpClient.BaseAddress = new Uri(keycloakOptions.TokenUrl);
             });
+
+            services.AddHttpContextAccessor();
+
+            services.AddScoped<IUserContext, UserContext>();
         }
 
         private static void AddPersistence(IServiceCollection services, IConfiguration configuration)
@@ -89,6 +101,17 @@ namespace Rental.Infrastructure
                 new SqlConnectionFactory(connectionString));
 
             SqlMapper.AddTypeHandler(new DateOnlyTypeHandler());
+        }
+
+        private static void AddAuthorization(IServiceCollection services)
+        {
+            services.AddScoped<AuthorizationService>();
+
+            services.AddTransient<IClaimsTransformation, CustomClaimsTransformation>();
+
+            services.AddTransient<IAuthorizationHandler, PermissionAuthorizationHandler>();
+
+            services.AddTransient<IAuthorizationPolicyProvider, PermissionAuthorizationPolicyProvider>();
         }
     }
 }

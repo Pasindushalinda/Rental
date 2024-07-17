@@ -21,7 +21,6 @@
     <Folder Include="Abstractions\Messaging\" />
     <Folder Include="Abstractions\Clock\" />
     <Folder Include="Abstractions\Data\" />
-    <Folder Include="Abstractions\Authentication\" />
     <Folder Include="Apartments\SearchApartments\" />
     <Folder Include="Bookings\GetBooking\" />
     <Folder Include="Users\LogInUser\" />
